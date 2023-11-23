@@ -178,7 +178,8 @@ resource "local_file" "tf-key" {
 
 resource "aws_launch_template" "talon_server_lt" {
   name_prefix = "talon-server-template"
-  image_id = "ami-0d92749d46e71c34c"
+  // image_id = "ami-0d92749d46e71c34c"
+  image_id = "ami-027a0367928d05f3e"
   instance_type = "t2.micro"
   key_name = "tf-key-pair"
 
@@ -203,7 +204,7 @@ resource "aws_launch_template" "talon_server_lt" {
     }
   }
 
-  user_data = base64encode(templatefile("${path.module}/templates/ecs/setup.sh", { IMAGE = var.DOCKER_IMAGE }))
+  user_data = base64encode(templatefile("${path.module}/templates/ecs/setup.sh", { IMAGE = var.DOCKER_IMAGE, AWS_ACCOUNT = var.AWS_ACCOUNT }))
 }
 
 
@@ -279,9 +280,10 @@ resource "aws_ecs_task_definition" "server_ecs_task_definition" {
      logConfiguration: {
        logDriver: "awslogs",
         options: {
-          "awslogs-group": "/ecs/talon-server",
+          "awslogs-group": "talon-server-container",
           "awslogs-region": "ap-south-1",
-          "awslogs-stream-prefix": "ecs"
+          "awslogs-create-group":  "true",
+          "awslogs-stream-prefix": "talon"
         }
       }
    }
@@ -290,7 +292,7 @@ resource "aws_ecs_task_definition" "server_ecs_task_definition" {
 
 variable "redeployment_timestamp" {
   type    = string
-  default = "2023-11-22T15:00:00Z" # Set a specific timestamp
+  default = "2023-11-23T19:30:43Z" # Set a specific timestamp
 }
 
 resource "aws_ecs_service" "talon_server_service" {
