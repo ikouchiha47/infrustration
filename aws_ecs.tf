@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "talon_ecs_tg" {
  name        = "ecs-target-group"
  port        = 9090
  protocol    = "HTTP"
- target_type = "instance"
+ target_type = "ip"
  vpc_id      = aws_vpc.talon_vpc.id
  health_check {
    path = "/talon/api/ping"
@@ -236,7 +236,7 @@ resource "aws_ecs_capacity_provider" "ecs_talon_cp" {
      maximum_scaling_step_size = 1000
      minimum_scaling_step_size = 1
      status                    = "ENABLED"
-     target_capacity           = 2
+     target_capacity           = 1
    }
  }
 }
@@ -294,7 +294,6 @@ variable "redeployment_timestamp" {
 }
 
 resource "aws_ecs_service" "talon_server_service" {
-  // name            = "talon-server-service"
   name            = "TalonServerEcsTask"
   cluster         = aws_ecs_cluster.talon_cluster.id
   task_definition = aws_ecs_task_definition.server_ecs_task_definition.arn
