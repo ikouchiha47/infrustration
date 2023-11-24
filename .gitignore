@@ -1,4 +1,4 @@
-tf-key-pair
+tf-key-pair*
 terraform.*
 .terraform/
 tfplan
