@@ -5,3 +5,8 @@ variable "DOCKER_IMAGE" {
 variable "AWS_ACCOUNT" {
   type = string
 }
+
+variable "ENVIRONMENT" {
+  type = string
+  default = "beta"
+}
