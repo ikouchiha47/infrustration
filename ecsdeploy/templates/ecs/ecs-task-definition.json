@@ -1,0 +1,16 @@
+[
+  {
+    "essential": true,
+    "memory": 512,
+    "name": "talon-server",
+    "cpu": 1,
+    "image": "${IMAGE}",
+    "environment": [],
+    "portMappings": [
+      {
+        "containerPort": 9090,
+        "hostPort": 9090
+      }
+    ]
+  }
+]
