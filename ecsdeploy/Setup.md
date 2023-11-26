@@ -30,3 +30,14 @@
 - [x] The load balancer target is also attached to the same vpc.
 - [x] __The ASG is connected to the ALB using ALB Target Group ARN__
 - [x] Create ecs task and launch template 
+
+
+### Links:
+
+- https://www.architect.io/blog/2021-03-30/create-and-manage-an-aws-ecs-cluster-with-terraform/
+- https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-auto-scaling.html
+- https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html
+- https://docs.aws.amazon.com/autoscaling/ec2/userguide/attach-load-balancer-asg.html
+- https://docs.aws.amazon.com/autoscaling/ec2/userguide/tutorial-ec2-auto-scaling-load-balancer.html
+
+
