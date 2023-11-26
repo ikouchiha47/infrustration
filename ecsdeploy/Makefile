@@ -12,3 +12,7 @@ terraform.ecs.destroy:
 
 terraform.ecs.show: 
 	( AWS_ACCOUNT=${AWS_ACCOUNT} DOCKER_BUILD_TAG=${DOCKER_BUILD_TAG} bash scripts/tcl.sh -a show )
+
+sync.origin:
+	git push origin main:master
+	git push gitlab main:master
