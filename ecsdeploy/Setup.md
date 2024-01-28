@@ -35,9 +35,11 @@
 ### Links:
 
 - https://www.architect.io/blog/2021-03-30/create-and-manage-an-aws-ecs-cluster-with-terraform/
+- https://medium.com/swlh/creating-an-aws-ecs-cluster-of-ec2-instances-with-terraform-85a10b5cfbe3
+- https://medium.com/geekculture/how-to-manage-auto-scaling-group-and-load-balancer-with-terraform-9ece263060b5
 - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-auto-scaling.html
+- https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html
 - https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html
 - https://docs.aws.amazon.com/autoscaling/ec2/userguide/attach-load-balancer-asg.html
 - https://docs.aws.amazon.com/autoscaling/ec2/userguide/tutorial-ec2-auto-scaling-load-balancer.html
-
 

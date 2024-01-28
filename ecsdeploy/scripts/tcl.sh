@@ -5,18 +5,21 @@
 #
 function apply() {
   echo "aws account ${AWS_ACCOUNT} ${DOCKER_BUILD_TAG}"
-  terraform init
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform validate
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform plan
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform apply
 }
 
@@ -24,6 +27,7 @@ function apply() {
 function destroy() {
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform destroy
 }
 
@@ -31,6 +35,7 @@ function destroy() {
 function show() {
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform show
 }
 

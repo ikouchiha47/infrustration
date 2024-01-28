@@ -15,7 +15,6 @@ aws iam attach-role-policy \
       --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
 
 
-
 aws iam create-role \
       --role-name ecsInstanceRole  \
       --assume-role-policy-document file://./infrafiles/ecs/ecs_execution_role.json
