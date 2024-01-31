@@ -3,4 +3,4 @@ terraform.*
 .terraform/
 tfplan
 extra
-
+*.out

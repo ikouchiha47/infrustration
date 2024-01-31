@@ -26,18 +26,18 @@ validate talon server:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - terraform validate
-    - terraform plan -out plan.out --target=module.services
+    - terraform plan -out talon_plan.out --target=module.services
   cache:
     key: plan
     policy: push
     paths:
-    - plan.out
+    - talon_plan.out
 
 apply talon server:
   extends: .template
   stage: apply
   script:
-  - terraform apply plan.out --target=module.services --auto-approve
+  - terraform apply -auto-approve talon_plan.out 
   cache:
     key: plan
     policy: pull

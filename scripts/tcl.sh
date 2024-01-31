@@ -21,7 +21,7 @@ function plan() {
     TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
-    terraform plan --target=module.services
+    terraform plan -out plan.out --target=module.services
 }
 
 function apply() {
