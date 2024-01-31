@@ -1,0 +1,49 @@
+stages:
+  - validate_plan
+  - apply
+  - destroy
+
+.template:
+  image:
+    name: hashicorp/terraform:1.5.7
+    entrypoint: [""]
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - export TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT}
+    - export TF_VAR_AWS_REGION=${AWS_DEFAULT_REGION}
+    - TF_VAR_AWS_PROFILE=${AWS_DEFAULT_PROFILE} terraform init
+
+validate talon server:
+  extends: .template
+  stage: validate_plan
+  script:
+    - export TF_VAR_APP_NAME=talon-server
+    - export TF_VAR_PARAM_PREFIX=talon/apiserver
+    - export TF_VAR_ENVIRONMENT=prod
+    - terraform validate
+    - terraform plan -out plan.out
+  cache:
+    key: plan
+    policy: push
+    paths:
+    - plan.out
+
+apply talon server:
+  extends: .template
+  stage: apply
+  script:
+  - terraform apply plan.out
+  cache:
+    key: plan
+    policy: pull
+    paths:
+    - plan.out
+  when: manual
+
+destroy talon sever:
+  extends: .template
+  stage: destroy
+  script:
+  - terraform destroy -auto-approve
+  when: manual
