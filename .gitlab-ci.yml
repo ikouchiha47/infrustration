@@ -55,7 +55,7 @@ validate talon server:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform init -backend-config=./talon.hcl && \
+    - terraform init -chdir=modules/services -backend-config=./modules/services/talon.hcl && \
       terraform validate && \
       terraform plan
   when: manual
