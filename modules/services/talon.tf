@@ -141,7 +141,7 @@ data "aws_ecs_cluster" "selected" {
 
 resource "aws_ecs_service" "mitil_ecs_service" {
     name = "talon-server"
-    cluster = aws_ecs_cluster.selected.id 
+    cluster = data.aws_ecs_cluster.selected.id 
     task_definition = aws_ecs_task_definition.mitil_task_definition.arn
     desired_count = 1
 

@@ -81,10 +81,32 @@ function show() {
     terraform show
 }
 
-__ACTIONS__=":apply:show:destroy:plan:"
+function plan_svc() {
+  echo "aws account ${AWS_ACCOUNT} ${DOCKER_BUILD_TAG}"
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform -chdir=./modules/services init \
+    -backend-config="./talon.hcl"
+
+  TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
+    TF_VAR_APP_NAME="${APP_NAME}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
+    terraform -chdir=./modules/services validate
+
+  TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
+    TF_VAR_APP_NAME="${APP_NAME}" \
+    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
+    terraform -chdir=./modules/services plan
+}
+
+__ACTIONS__=":apply:show:destroy:plan:plan_svc:"
 ACTION="show"
 
-usage() { echo "Usage: $0 [-a <show|apply|destroy|plan>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-a <show|apply|destroy|plan|plan_svc>]" 1>&2; exit 1; }
 
 while getopts ":a:" arg; do
   case "${arg}" in
@@ -109,6 +131,8 @@ if [[ "$ACTION" == "show" ]]; then
   show
 elif [[ "$ACTION" == "plan" ]]; then
   plan
+elif [[ "$ACTION" == "plan_svc" ]]; then
+  plan_svc
 elif [[ "$ACTION" == "apply" ]]; then
   apply
 elif [[ "$ACTION" == "destroy" ]]; then

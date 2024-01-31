@@ -16,16 +16,10 @@ terraform.ecs.show:
 	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} bash scripts/tcl.sh -a show )
 
 terraform.svc.plan: 
-	( cd modules/services && \
-		BACK_CFG=./talon.hcl \
-		AWS_ACCOUNT=${AWS_ACCOUNT} \
-		AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash ../../scripts/tcl.sh -a plan )
+	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash ./scripts/tcl.sh -a plan_svc )
 
 terraform.svc.apply: 
-	( cd modules/services && \
-		BACK_CFG=./talon.hcl \
-		AWS_ACCOUNT=${AWS_ACCOUNT} \
-		AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash ../../scripts/tcl.sh -a apply )
+	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash ./scripts/tcl.sh -a plan_svc )
 
 sync.origin:
 	git push origin main:master
