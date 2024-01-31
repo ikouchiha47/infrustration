@@ -49,7 +49,7 @@ validate talon server:
   extends: .template
   stage: validate_plan
   variables:
-    TF_ROOT=modules/services
+    TF_ROOT: modules/services
   script:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
@@ -65,7 +65,7 @@ apply talon server:
   extends: .template
   stage: apply
   variables:
-    TF_ROOT=modules/services
+    TF_ROOT: modules/services
   script:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
@@ -79,7 +79,7 @@ destroy talon sever:
   extends: .template
   stage: destroy
   variables:
-    TF_ROOT=modules/services
+    TF_ROOT: modules/services
   script:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
