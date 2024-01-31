@@ -88,6 +88,10 @@ resource "aws_subnet" "mitil_server_subnet" {
     cidr_block              = cidrsubnet(aws_vpc.mitil_vpc.cidr_block, 8, 1)
     map_public_ip_on_launch = true
     availability_zone       = "ap-south-1b"
+
+    tags = {
+      Name = "${var.mitil_subnet1_tag}"
+    }
 }
 
 resource "aws_subnet" "mitil_server_subnet2" {
@@ -95,6 +99,10 @@ resource "aws_subnet" "mitil_server_subnet2" {
     cidr_block              = cidrsubnet(aws_vpc.mitil_vpc.cidr_block, 8, 2)
     map_public_ip_on_launch = true
     availability_zone       = "ap-south-1a"
+
+    tags = {
+      Name = "${var.mitil_subnet2_tag}"
+    }
 }
 
 

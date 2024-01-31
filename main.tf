@@ -4,11 +4,7 @@ provider "aws" {
 }
 
 terraform {
-  backend "s3" {
-    bucket = "mitil-tfstates"
-    key    = "prod/talon/terraform.tfstate"
-    region = "ap-south-1"
-  }
+  backend "s3" {}
 }
 
 
@@ -28,11 +24,3 @@ module "networking" {
   ENVIRONMENT = var.ENVIRONMENT
 }
 
-module "services" {
-  source = "./modules/services"
-  APP_NAME = var.APP_NAME
-  PARAM_PREFIX = var.PARAM_PREFIX
-  ENVIRONMENT = var.ENVIRONMENT
-  AWS_ACCOUNT =  var.AWS_ACCOUNT
-  AWS_REGION = var.AWS_REGION
-}

@@ -3,9 +3,11 @@
 # Wrapper over terraform commands and helpers
 #
 #
+BACKEND_CONFIG="${BACK_CFG:-./infra.hcl}"
+
 function plan() {
   echo "aws account ${AWS_ACCOUNT} ${DOCKER_BUILD_TAG}"
-  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init -backend-config="${BACKEND_CONFIG}"
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_AWS_REGION="ap-south-1" \
@@ -21,28 +23,28 @@ function plan() {
     TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
-    terraform plan -out plan.out --target=module.services
+    terraform plan
 }
 
 function apply() {
   echo "aws account ${AWS_ACCOUNT} ${DOCKER_BUILD_TAG}"
-  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init -backend-config="${BACKEND_CONFIG}"
 
-  TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_AWS_REGION="ap-south-1" \
-    TF_VAR_PARAM_PREFIX="talon/apiserver" \
-    TF_VAR_ENVIRONMENT="prod" \
-    TF_VAR_APP_NAME="${APP_NAME}" \
-    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
-    terraform validate
+  # TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
+  #   TF_VAR_AWS_REGION="ap-south-1" \
+  #   TF_VAR_PARAM_PREFIX="talon/apiserver" \
+  #   TF_VAR_ENVIRONMENT="prod" \
+  #   TF_VAR_APP_NAME="${APP_NAME}" \
+  #   TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
+  #   terraform validate
 
-  TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_AWS_REGION="ap-south-1" \
-    TF_VAR_PARAM_PREFIX="talon/apiserver" \
-    TF_VAR_ENVIRONMENT="prod" \
-    TF_VAR_APP_NAME="${APP_NAME}" \
-    TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
-    terraform plan --target=module.services
+  # TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
+  #   TF_VAR_AWS_REGION="ap-south-1" \
+  #   TF_VAR_PARAM_PREFIX="talon/apiserver" \
+  #   TF_VAR_ENVIRONMENT="prod" \
+  #   TF_VAR_APP_NAME="${APP_NAME}" \
+  #   TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
+  #   terraform plan
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_AWS_REGION="ap-south-1" \
@@ -55,6 +57,8 @@ function apply() {
 
 
 function destroy() {
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init -backend-config="${BACKEND_CONFIG}"
+
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_AWS_REGION="ap-south-1" \
     TF_VAR_PARAM_PREFIX="talon/apiserver" \
@@ -66,6 +70,8 @@ function destroy() {
 
 
 function show() {
+  TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init -backend-config="${BACKEND_CONFIG}"
+
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
     TF_VAR_AWS_REGION="ap-south-1" \
     TF_VAR_PARAM_PREFIX="talon/apiserver" \

@@ -1,15 +1,15 @@
-module "iam_policies" {
-  source = "../iam"
-}
-
-module "networking" {
-    source = "../networking"
-    ENVIRONMENT = var.ENVIRONMENT
-}
-
+// iam and ssm 
 data "aws_ssm_parameter" "version" {
   name = "/${var.ENVIRONMENT}/${var.PARAM_PREFIX}/version"
   with_decryption = true
+}
+
+data "aws_iam_instance_profile" "ecs_instance_profile_arn" {
+  name = "ecsInstanceRole"
+}
+
+data "aws_security_group" "security_group" {
+  name = "MitilAPISg"
 }
 
 resource "aws_launch_template" "mitil_server_launch_configuration" {
@@ -17,23 +17,28 @@ resource "aws_launch_template" "mitil_server_launch_configuration" {
   image_id      = "ami-027a0367928d05f3e"
   instance_type = "t2.micro"
   key_name      = "tf-key-pair"
-  vpc_security_group_ids = [module.networking.mitil_api_security_group_id]
+  vpc_security_group_ids = [data.aws_security_group.security_group.id]
 
 
   iam_instance_profile {
     // name = "ecsInstanceRole"
-    arn = module.iam_policies.ecs_instance_profile_arn
+    arn = data.aws_iam_instance_profile.ecs_instance_profile_arn
   }
 
   user_data = filebase64("${path.module}/templates/ecs/ecs.sh")
 }
 
+data "aws_vpc" "vpc" {
+  tags = {
+      Name = "Talon VPC"
+  }
+}
 // Talon API Server
 resource "aws_lb_target_group" "mitil_lb_tg" {
     name = "MitilServerTgHttp"
     port = 9090
     protocol = "HTTP"
-    vpc_id = module.networking.aws_mitil_vpc_id
+    vpc_id = data.aws_vpc.vpc.id
 
     health_check {    
       healthy_threshold   = 3    
@@ -46,8 +51,18 @@ resource "aws_lb_target_group" "mitil_lb_tg" {
   }
 }
 
+
+data "aws_lb" "loadbalancer" {
+  name = "mitil-server-lb"
+}
+
+data "aws_lb_listener" "https_lb" {
+  load_balancer_arn = data.aws_lb.loadbalancer.arn
+  port              = 443
+}
+
 resource "aws_lb_listener_rule" "mitil_server_lb" {
-  listener_arn = module.networking.aws_mitil_lb_listener_arn
+  listener_arn = data.aws_lb_listener.https_lb.arn
   priority = 100
 
   action {
@@ -62,9 +77,23 @@ resource "aws_lb_listener_rule" "mitil_server_lb" {
   }
 }
 
+data "aws_subnet" "subnet1" {
+  filter {
+      name = "tag:Name"
+      values = ["${var.mitil_subnet1_tag}"]
+    }
+}
+
+data "aws_subnet" "subnet2" {
+  filter {
+      name = "tag:Name"
+      values = ["${var.mitil_subnet2_tag}"]
+    }
+}
+
 resource "aws_autoscaling_group" "mitil_server_ecs_asg" {
   name                = "MitilServerAsg"
-  vpc_zone_identifier = [module.networking.mitil_server_subnet_id, module.networking.mitil_server_subnet2_id]
+  vpc_zone_identifier = [data.aws_subnet.subnet1.id, data.aws_subnet.subnet2.id]
   target_group_arns = [aws_lb_target_group.mitil_lb_tg.arn]
 
   launch_template {
@@ -106,9 +135,13 @@ resource "aws_ecs_task_definition" "mitil_task_definition" {
     })
 }
 
+data "aws_ecs_cluster" "selected" {
+  cluster_name = "mitil-server-cluster"
+}
+
 resource "aws_ecs_service" "mitil_ecs_service" {
     name = "talon-server"
-    cluster = module.networking.aws_mitil_cluster_id
+    cluster = aws_ecs_cluster.selected.id 
     task_definition = aws_ecs_task_definition.mitil_task_definition.arn
     desired_count = 1
 

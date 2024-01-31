@@ -4,7 +4,7 @@ variable "AWS_ACCOUNT" {
 
 variable "AWS_PROFILE" {
  type = string
- default = "default"
+ default = "mitil"
 }
 
 variable "AWS_REGION" {

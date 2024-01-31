@@ -16,7 +16,34 @@ stages:
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - export TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT}
     - export TF_VAR_AWS_REGION=${AWS_DEFAULT_REGION}
-    - TF_VAR_AWS_PROFILE=${AWS_DEFAULT_PROFILE} terraform init
+    - export TF_VAR_AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+
+
+validate and plan infra:
+  extends: .template
+  stage: validate_plan
+  script:
+    - export TF_VAR_APP_NAME=talon-server
+    - export TF_VAR_PARAM_PREFIX=talon/apiserver
+    - export TF_VAR_ENVIRONMENT=prod
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - terraform init -backend-config=./infra.hcl
+    - terraform validate
+    - terraform plan 
+  when: manual
+
+
+create infra:
+  extends: .template
+  stage: apply
+  script:
+    - export TF_VAR_APP_NAME=talon-server
+    - export TF_VAR_PARAM_PREFIX=talon/apiserver
+    - export TF_VAR_ENVIRONMENT=prod
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - terraform init -backend-config=./infra.hcl
+    - terraform apply -auto-approve
+  when: manual
 
 validate talon server:
   extends: .template
@@ -25,29 +52,36 @@ validate talon server:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
-    - terraform validate
-    - terraform plan -out talon_plan.out --target=module.services
-  cache:
-    key: plan
-    policy: push
-    paths:
-    - talon_plan.out
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - cd modules/services/ && \
+      terraform init -backend-config=./talon.hcl && \
+      terraform validate && \
+      terraform plan
+  when: manual
+
 
 apply talon server:
   extends: .template
   stage: apply
   script:
-  - terraform apply -auto-approve talon_plan.out 
-  cache:
-    key: plan
-    policy: pull
-    paths:
-    - plan.out
+    - export TF_VAR_APP_NAME=talon-server
+    - export TF_VAR_PARAM_PREFIX=talon/apiserver
+    - export TF_VAR_ENVIRONMENT=prod
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - cd modules/services/ && \
+      terraform init -backend-config=./talon.hcl && \
+      terraform apply -auto-approve
   when: manual
 
 destroy talon sever:
   extends: .template
   stage: destroy
   script:
-  - terraform destroy -auto-approve
+    - export TF_VAR_APP_NAME=talon-server
+    - export TF_VAR_PARAM_PREFIX=talon/apiserver
+    - export TF_VAR_ENVIRONMENT=prod
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - cd modules/services/ && \
+      terraform init -backend-config=./talon.hcl && \ 
+      terraform destroy -auto-approve
   when: manual
