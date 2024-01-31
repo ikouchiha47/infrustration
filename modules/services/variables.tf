@@ -19,10 +19,6 @@ variable PARAM_PREFIX {
   type = string
 }
 
-variable "DOCKER_IMAGE" {
-    type = string
-}
-
 variable "service_configs" {
   type = list(object({
     name    = string

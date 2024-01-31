@@ -8,7 +8,7 @@ module "networking" {
 }
 
 data "aws_ssm_parameter" "version" {
-  name = "${var.ENVIRONMENT}/${var.PARAM_PREFIX}/version"
+  name = "/${var.ENVIRONMENT}/${var.PARAM_PREFIX}/version"
   with_decryption = true
 }
 
@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "mitil_task_definition" {
     // execution_role_arn = aws_iam_role.ecsTaskExecutionRole.arn
 
     container_definitions = templatefile("${path.module}/templates/ecs/ecs-task-definition.json", {
-      IMAGE: format("%s.dkr.ecr.%s.amazonaws.com/%s", var.AWS_ACCOUNT, var.AWS_REGION, aws_ssm_parameter.version.value)
+      IMAGE: format("%s.dkr.ecr.%s.amazonaws.com/%s", var.AWS_ACCOUNT, var.AWS_REGION, data.aws_ssm_parameter.version.value)
     })
 }
 

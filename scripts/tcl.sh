@@ -8,13 +8,17 @@ function plan() {
   TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform validate
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform plan --target=module.services
@@ -25,19 +29,25 @@ function apply() {
   TF_VAR_AWS_PROFILE=${AWS_PROFILE} terraform init
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform validate
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
-    terraform plan
+    terraform plan --target=module.services
 
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform apply
@@ -46,7 +56,9 @@ function apply() {
 
 function destroy() {
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform destroy
@@ -55,7 +67,9 @@ function destroy() {
 
 function show() {
   TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT} \
-    TF_VAR_DOCKER_IMAGE="${AWS_ACCOUNT}.dkr.ecr.ap-south-1.amazonaws.com/${DOCKER_BUILD_TAG}" \
+    TF_VAR_AWS_REGION="ap-south-1" \
+    TF_VAR_PARAM_PREFIX="talon/apiserver" \
+    TF_VAR_ENVIRONMENT="prod" \
     TF_VAR_APP_NAME="${APP_NAME}" \
     TF_VAR_AWS_PROFILE=${AWS_PROFILE} \
     terraform show

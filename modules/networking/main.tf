@@ -225,5 +225,5 @@ output "aws_mitil_cluster_id" {
 }
 
 output "mitil_api_security_group_id" {
-  value = aws_security_group.talon_api_sg.id
+  value = aws_security_group.mitil_api_sg.id
 }
