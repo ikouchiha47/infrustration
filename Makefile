@@ -5,6 +5,9 @@ setup.mac:
 terraform.ecs.plan: 
 	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash scripts/tcl.sh -a plan )
 
+terraform.ecs.import: 
+	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} APP_NAME=talon-server bash scripts/tcl.sh -a import )
+
 terraform.ecs.apply: 
 	( AWS_ACCOUNT=${AWS_ACCOUNT} AWS_PROFILE=${AWS_PROFILE} bash scripts/tcl.sh -a apply )
 	chmod 400 tf-key-pair.pem

@@ -41,7 +41,6 @@ create infra:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform init -backend-config=./infra.hcl
     - terraform apply -auto-approve
   when: manual
 
@@ -57,7 +56,8 @@ validate talon server:
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
     - terraform -chdir=modules/services init -backend-config=./talon.hcl
     - terraform -chdir=modules/services validate
-    - terraform -chdir=modules/services plan
+    - terraform -chdir=modules/services plan -out=talon.tfplan
+    - aws s3 cp talon.tfplan "s3://${AWS_TF_PLAN_FILES}/talon"
   when: manual
 
 
@@ -71,8 +71,8 @@ apply talon server:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform -chdir=modules/services init -backend-config=./talon.hcl
-    - terraform -chdir=modules/services apply -auto-approve
+    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/talon" talon.tfplan
+    - terraform -chdir=modules/services apply talon.tfplan -auto-approve
   when: manual
 
 destroy talon sever:
@@ -85,6 +85,7 @@ destroy talon sever:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform -chdir=modules/services init -backend-config=./talon.hcl
+    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/talon" talon.tfplan
     - terraform -chdir=modules/services destroy -auto-approve
   when: manual
+

@@ -18,28 +18,28 @@ resource "aws_acm_certificate" "mitil_in" {
 }
 
 resource "aws_route53_zone" "mitil_in" {
-  name = "mitil.in"
+ name = "mitil.in"
 }
 
- resource "aws_route53_record" "mitil_acm_validation" {
-   for_each = {
-     for dvo in aws_acm_certificate.mitil_in.domain_validation_options : dvo.domain_name => {
-       name   = dvo.resource_record_name
-       record = dvo.resource_record_value
-       type   = dvo.resource_record_type
-     }
-   }
- 
-   zone_id = aws_route53_zone.mitil_in.zone_id
-   name    = each.value.name
-   type    = each.value.type
-   ttl     = 60
-   records = [
-     each.value.record,
-   ]
- 
-   # allow_overwrite = true
- }
+resource "aws_route53_record" "mitil_acm_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.mitil_in.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  zone_id = aws_route53_zone.mitil_in.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = 60
+  records = [
+    each.value.record,
+  ]
+
+  allow_overwrite = true
+}
 
 resource "aws_acm_certificate_validation" "mitil_in" {
   certificate_arn         = aws_acm_certificate.mitil_in.arn
