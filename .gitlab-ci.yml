@@ -29,7 +29,8 @@ validate and plan infra:
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
     - terraform init -backend-config=./infra.hcl
     - terraform validate
-    - terraform plan 
+    - terraform plan -out=infra.plan
+    - aws s3 cp infra.tfplan "s3://${AWS_TF_PLAN_FILES}/talon"
   when: manual
 
 
@@ -41,51 +42,20 @@ create infra:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform apply -auto-approve
-  when: manual
-
-validate talon server:
-  extends: .template
-  stage: validate_plan
-  variables:
-    TF_ROOT: modules/services
-  script:
-    - export TF_VAR_APP_NAME=talon-server
-    - export TF_VAR_PARAM_PREFIX=talon/apiserver
-    - export TF_VAR_ENVIRONMENT=prod
-    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - terraform -chdir=modules/services init -backend-config=./talon.hcl
-    - terraform -chdir=modules/services validate
-    - terraform -chdir=modules/services plan -out=talon.tfplan
-    - aws s3 cp talon.tfplan "s3://${AWS_TF_PLAN_FILES}/talon"
+    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/infra" infra.tfplan
+    - terraform apply -auto-approve infra.tfplan
   when: manual
 
 
-apply talon server:
-  extends: .template
-  stage: apply
-  variables:
-    TF_ROOT: modules/services
-  script:
-    - export TF_VAR_APP_NAME=talon-server
-    - export TF_VAR_PARAM_PREFIX=talon/apiserver
-    - export TF_VAR_ENVIRONMENT=prod
-    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/talon" talon.tfplan
-    - terraform -chdir=modules/services apply talon.tfplan -auto-approve
-  when: manual
-
-destroy talon sever:
+destroy infra:
   extends: .template
   stage: destroy
-  variables:
-    TF_ROOT: modules/services
   script:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/talon" talon.tfplan
-    - terraform -chdir=modules/services destroy -auto-approve
+    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/infra" infra.tfplan
+    - terraform destroy -auto-approve
   when: manual
 
