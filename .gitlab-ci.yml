@@ -1,6 +1,6 @@
 stages:
-  - validate_plan
-  - apply
+  - validate
+  - deploy
   - destroy
 
 .template:
@@ -17,20 +17,18 @@ stages:
     - export TF_VAR_AWS_ACCOUNT=${AWS_ACCOUNT}
     - export TF_VAR_AWS_REGION=${AWS_DEFAULT_REGION}
     - export TF_VAR_AWS_PROFILE=${AWS_DEFAULT_PROFILE}
+    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
 
 
-validate and plan infra:
+validate infra:
   extends: .template
   stage: validate_plan
   script:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
-    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
     - terraform init -backend-config=./infra.hcl
     - terraform validate
-    - terraform plan -out=infra.plan
-    - aws s3 cp infra.tfplan "s3://${AWS_TF_PLAN_FILES}/talon"
   when: manual
 
 
@@ -42,7 +40,7 @@ create infra:
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
     - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/infra" infra.tfplan
+    - terraform plan -out=infra.plan
     - terraform apply -auto-approve infra.tfplan
   when: manual
 
@@ -54,8 +52,7 @@ destroy infra:
     - export TF_VAR_APP_NAME=talon-server
     - export TF_VAR_PARAM_PREFIX=talon/apiserver
     - export TF_VAR_ENVIRONMENT=prod
-    - export AWS_PROFILE=${AWS_DEFAULT_PROFILE}
-    - aws s3 cp "s3://${AWS_TF_PLAN_FILES}/infra" infra.tfplan
+    - terraform init -backend-config=./infra.hcl
     - terraform destroy -auto-approve
   when: manual
 

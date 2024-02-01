@@ -20,6 +20,17 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
+data "aws_iam_policy_document" "ssmGetParamRule" {
+  statement {
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters"
+    ]
+
+    resources = ["*"]
+  }
+}
+
 // IAM Role for ec2 to ecr image pull
 resource "aws_iam_role" "ecsInstanceRole" {
   name = "ecsInstanceRole"
@@ -34,11 +45,21 @@ resource "aws_iam_instance_profile" "ecsInstanceProfile" {
 resource "aws_iam_role_policy_attachment" "ecsAssumeRole" {
   for_each = toset([
       "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
-      "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+      "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
   ])
 
     role = aws_iam_role.ecsInstanceRole.name
     policy_arn = each.value
+}
+
+resource "aws_iam_policy" "ecsGetParamsPolicy" {
+  name = "ecsGetParamsPolicy"
+  policy = "${data.aws_iam_policy_document.ssmGetParamRule.json}"
+}
+
+resource "aws_iam_role_policy_attachment" "ecsGetParameterRule" {
+  role       = aws_iam_role.ecsInstanceRole.name
+  policy_arn = aws_iam_policy.ecsGetParamsPolicy.arn
 }
 
 // IAM role for ecs task execution
@@ -61,6 +82,11 @@ resource "aws_iam_role_policy_attachment" "ecsExecutionRole" {
 
     role = aws_iam_role.ecsTaskExecutionRole.name
     policy_arn = each.value
+}
+
+resource "aws_iam_role_policy_attachment" "ecsTaskGetParameterRule" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = aws_iam_policy.ecsGetParamsPolicy.arn
 }
 
 output "ecs_instance_profile_arn" {
